@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
+#include <err.h>
 #include <vector>
 
 static int format = 0;
@@ -167,6 +168,9 @@ int readTLV(FILE *fp, struct TLV *tlv, unsigned int limit)
 
 		tlv->value = (unsigned char *)malloc(length);
 
+		if (tlv->value == NULL)
+			err(1, "malloc");
+
 		if (!fread(tlv->value, length, 1, fp))
 			return 1;
 
@@ -187,6 +191,9 @@ int readTLV(FILE *fp, struct TLV *tlv, unsigned int limit)
 			depth++;
 
 			child = (struct TLV *)malloc(sizeof(struct TLV));
+
+			if (child == NULL)
+				err(1, "malloc");
 
 			if (readTLV(fp, child, length-i))
 			{
@@ -213,6 +220,9 @@ int readTLV(FILE *fp, struct TLV *tlv, unsigned int limit)
 		depth++;
 
 		child = (struct TLV *)malloc(sizeof(struct TLV));
+
+		if (child == NULL)
+			err(1, "malloc");
 
 		n = readTLV(fp, child, limit-tlv->nbytes);
 
